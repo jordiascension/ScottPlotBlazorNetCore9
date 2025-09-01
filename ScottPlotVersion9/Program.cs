@@ -1,4 +1,3 @@
-using ScottPlotVersion9.Client.Pages;
 using ScottPlotVersion9.Components;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,7 +22,6 @@ else
 }
 
 app.UseHttpsRedirection();
-
 
 app.UseAntiforgery();
 

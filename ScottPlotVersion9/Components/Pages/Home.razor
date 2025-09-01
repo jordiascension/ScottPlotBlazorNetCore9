@@ -1,7 +1,48 @@
 ﻿@page "/"
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+@inject NavigationManager Navigator
+@inject IJSRuntime JSRuntime
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<button @onclick="OpenPlotPopupWindowAsync">@Content</button>
 
-Welcome to your new app.
+@code {
+    [Parameter]
+    public string ProjectName { get; set; }
+
+    [Parameter]
+    public String Content { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        ProjectName = "Original";
+        Content = "Fans";
+    }
+
+    //Action button - Go to Plot  - ActionType = 50
+    private async Task OpenPlotPopupWindowAsync()
+    {
+        try
+        {
+            var baseUri = $"{Navigator.BaseUri}";
+
+            var page = "plot";
+            var projectName = ProjectName;
+            var plotName = Content;
+            var link = $"{page}/{projectName}/{plotName}";
+
+            //var target = "_blank"; // Target attribute value "_blank" will create several new and unnamed windows
+            var target = page; // Target value with the Window's name to open
+            var windowLocation = "left=50,top=50";
+            var windowSize = "width=1425,height=710";
+            var windowFeatures = $"{windowLocation},{windowSize}";
+
+            await JSRuntime.InvokeVoidAsync("openWindow", baseUri, link, target, windowFeatures);
+        }
+        catch (Exception ex)
+        {
+            var exceptionMessage = ex.Message;
+        }
+    }
+}

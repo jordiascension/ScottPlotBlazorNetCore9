@@ -1,25 +1,76 @@
-﻿@page "/fans"
+﻿@page "/plot/{ProjectName}/{PlotName}"
 @rendermode InteractiveWebAssembly
+@layout EmptyLayout
 
 @using ScottPlot
 @using ScottPlot.AxisPanels
 @using System.Globalization
 @using ScottPlot.Blazor
+@using ScottPlotVersion9.Client.Components.Layout
+@using ScottPlotVersion9.Client.Utils
 
-<h1 style="text-align:center;">Fans</h1>
-<BlazorPlot @ref="blazorPlot" Style="width: 800px; height: 500px;" />
+<div style="display:flex; height:100vh; margin:0; background-color:black; color:white;">
+
+    <!-- Main content (plot + controls) -->
+    <div style="flex-grow:1; display:flex; flex-direction:column; position:relative; min-width:0;">
+
+        <!-- Plot area with relative positioning -->
+        <div style="position:relative;">
+            <h1 style="text-align:center; font-size: 12px; padding: 10px; margin:0;">@PlotName</h1>
+            <BlazorPlot @ref="blazorPlot" style="width:100%; height:640px;" />
+
+            <!-- Square button exactly at top-right corner of plot with image -->
+            <button style="
+                position:absolute;
+                top:0;
+                right:0;
+                width:30px;
+                height:30px;
+                padding:0;
+                background-color:black;
+                border:1px solid white;
+                box-sizing:border-box;
+            ">
+                <img src="/images/plots/pie-chart.png" style="width:100%; height:100%; object-fit:contain;" />
+            </button>
+        </div>
+
+        <!-- Control buttons below plot -->
+        <div style="display:flex; justify-content:flex-start; gap:10px; padding:3px; background-color:#d3d3d3; align-items:center;">
+            <!-- Horizontal and Vertical buttons, same width -->
+            <button style="height:30px; width:100px; padding:0; background-color:#f0f0f0; border:1px solid #888; color:black; box-sizing:border-box;">Horizontal</button>
+            <button style="height:30px; width:100px; padding:0; background-color:#f0f0f0; border:1px solid #888; color:black; box-sizing:border-box;">Vertical</button>
+
+            <!-- Reset button -->
+            <button style="height:30px; padding:0 14px; background-color:#d9534f; border:1px solid #a94442; color:white; box-sizing:border-box;">Reset Zooms</button>
+
+            <!-- Select menu with more width -->
+            <select style="height:30px; width:150px; padding:0 10px; background-color:white; border:1px solid #888; color:black; box-sizing:border-box;">
+                <option>HOUR_4</option>
+                <option>HOUR_8</option>
+                <option>DAY_1</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Vertical red column -->
+    <div style="width:20px; background-color:#ff4500; height:100vh;"></div>
+</div>
 
 @code {
+    [Parameter]
+    public string ProjectName { get; set; }
+
+    [Parameter]
+    public string PlotName { get; set; }
+
     BlazorPlot blazorPlot = new();
-
-
 
     // double[] ysLeft = { 0, 155.350, 310.700, 466.050, 621.400 };
     // double[] ysLeft2 = { 0, 78, 155, 233, 310 };
 
     double[] ysLeft = new double[] { 0, 10.000, 20.000, 30.000 };
     double[] ysLeft2 = new double[] { 0, 50, 100, 150, 200 };
-
 
     private System.Threading.Timer? AddNewDataTimer;
     private System.Threading.Timer? UpdatePlotTimer;
@@ -35,7 +86,7 @@
         if (firstRender)
         {
             var plt = blazorPlot.Plot;
-            PlotTheme.ApplyDarkTheme(plt);
+            PlotUtils.ApplyDarkTheme(plt);
 
             // double[] xs = { 0, 500, 1000, 1500, 2000 };
             // double[] ysLeft = { 0, 155.350, 310.700, 466.050, 621.400 };
@@ -51,28 +102,29 @@
             LeftAxis yLeftFlow = (LeftAxis)plt.Axes.Left;
             yLeftFlow.LabelText = "Volumetricflow";
             yLeftFlow.LabelFontSize = 12;
-            yLeftFlow.LabelFontColor = Colors.Green;
+            yLeftFlow.LabelFontColor = Color.FromHex("#72D400"); // Green
             yLeftFlow.MinimumSize = 80;
-            yLeftFlow.TickGenerator = new ScottPlot.TickGenerators.NumericManual(positions: ysLeft,
-            labels: ysLeft.Select(v => v == 0 ? "0" : v.ToString("N3", CultureInfo.InvariantCulture).Replace(",", ".")).ToArray());
+            yLeftFlow.TickGenerator = new ScottPlot.TickGenerators.NumericManual(
+                positions: ysLeft,
+                labels: ysLeft.Select(v => v == 0 ? "0" : v.ToString("N3", CultureInfo.InvariantCulture).Replace(",", ".")).ToArray());
 
-            yLeftFlow.TickLabelStyle.ForeColor = Colors.Green;               // Color de las marcas del eje izquierdo
-                                                                             // Color de los números del eje izquierdo
-                                                                             // yLeft.Min = ysLeft.Min();
-                                                                             // yLeft.Max = ysLeft.Max();
+            yLeftFlow.TickLabelStyle.ForeColor = Color.FromHex("#72D400"); // Green
 
-
+            // Color de las marcas del eje izquierdo
+            // Color de los números del eje izquierdo
+            // yLeft.Min = ysLeft.Min();
+            // yLeft.Max = ysLeft.Max();
 
             // // ===== EJE Y SECUNDARIO INDEPENDIENTE (Velocidad) =====
             LeftAxis yRightSpeed = plt.Axes.AddLeftAxis();
-            yRightSpeed.LabelText = "Massflow [tn/h]";
+            yRightSpeed.LabelText = "Speed [rpm]";
             yRightSpeed.LabelFontSize = 12;
-            yRightSpeed.LabelFontColor = Colors.Violet;
+            yRightSpeed.LabelFontColor = Color.FromHex("#FF1493"); // Violet
             yRightSpeed.MinimumSize = 50;
             yRightSpeed.TickGenerator = new ScottPlot.TickGenerators.NumericManual(
-            positions: ysLeft2,
-            labels: ysLeft2.Select(v => v.ToString()).ToArray());
-            yRightSpeed.TickLabelStyle.ForeColor = Colors.Violet;
+                positions: ysLeft2,
+                labels: ysLeft2.Select(v => v.ToString()).ToArray());
+            yRightSpeed.TickLabelStyle.ForeColor = Color.FromHex("#FF1493"); // Violet
             yRightSpeed.FrameLineStyle.IsVisible = false;
 
             // yLeft2.Min = ysLeft2.Min();
@@ -82,7 +134,7 @@
 
             // // ===== EJE X =====
             BottomAxis xAxis = (BottomAxis)plt.Axes.Bottom;
-            xAxis.LabelText = "Time [minutes]";
+            //xAxis.LabelText = "Time [minutes]";
             /*  xAxis.SetTicks(xs, xs.Select(v => v.ToString()).ToArray()) */
             ;
             // xAxis.Min = xs.Min();
@@ -103,18 +155,14 @@
             // Márgenes para dejar sitio a etiquetas
             plt.Axes.Margins(left: 180, right: 10, top: 10, bottom: 40);
 
-
             // xAxis.Min = xs.Min();
             // xAxis.Max = xs.Max();
-
-
 
             // yLeft.Min = ysLeft.Min();
             // yLeft.Max = ysLeft.Max();
 
             // yLeft2.Min = ysLeft2.Min();
             // yLeft2.Max = ysLeft2.Max();
-
 
             // plt.Legend.IsVisible = true;
             // plt.Legend.Alignment = Alignment.UpperRight;
@@ -123,17 +171,17 @@
             loggerFlow = plt.Add.DataLogger();
             loggerFlow.Axes.YAxis = yLeftFlow;
             loggerFlow.Color = Colors.DodgerBlue;
+            loggerFlow.ViewSlide(200); // show last 200 points
 
             loggerSpeed = plt.Add.DataLogger();
             loggerSpeed.Axes.YAxis = yRightSpeed;
             loggerSpeed.Color = Colors.Orange;
-
+            loggerSpeed.ViewSlide(200); // show last 200 points
 
             // Datos iniciales
-            int count = 3000;
+            int count = 200;
             loggerFlow.Add(walkerFlow.Next(count));
             loggerSpeed.Add(walkerSpeed.Next(count));
-
 
             blazorPlot.Refresh();
 
@@ -160,7 +208,7 @@
                 },
                 null,
                 TimeSpan.Zero,
-                TimeSpan.FromSeconds(1)
+                TimeSpan.FromSeconds(2)
                 );
         }
 

@@ -1,0 +1,7 @@
+﻿.empty-layout {
+    background-color: black;
+    color: white; /* ensures text is visible */
+    min-height: 100vh; /* fills viewport */
+    margin: 0;
+    padding: 0;
+}
