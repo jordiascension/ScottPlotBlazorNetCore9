@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ScottPlotVersion9.Client\ScottPlotVersion9.Client.csproj" />
+    <ProjectReference Include="..\UserControl\UserControl.csproj" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.0.6" />
   </ItemGroup>
 

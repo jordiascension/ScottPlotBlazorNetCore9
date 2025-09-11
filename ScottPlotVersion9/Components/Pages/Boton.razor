@@ -1,23 +1,10 @@
-﻿@page "/"
-@using ScottPlotVersion9.Client.Components.Pages
-@inject NavigationManager Navigator
+﻿@rendermode InteractiveServer
 @inject IJSRuntime JSRuntime
-
-<PageTitle>Home</PageTitle>
-
-Server Render Button custom component from Server project in InteractiveAuto Page
-
-<Boton></Boton><br/>
-
-Web Assembly component/page from WebAssembly project in InteractiveAuto Page
-
-<Counter></Counter>
-
-Web Assembly component from Razor Class Library project in InteractiveAuto Page
-
-<UserControl.IISGraphic @rendermode="InteractiveWebAssembly"></UserControl.IISGraphic>
-
+@inject NavigationManager Navigator
+<h3>Boton</h3>
+<button @onclick="OpenPlotPopupWindowAsync">Boton</button>
 @code {
+
     [Parameter]
     public string ProjectName { get; set; }
 
@@ -55,4 +42,5 @@ Web Assembly component from Razor Class Library project in InteractiveAuto Page
             var exceptionMessage = ex.Message;
         }
     }
+
 }
