@@ -1,5 +1,5 @@
 ﻿@page "/"
-@using ScottPlotVersion9.Client.Components.Pages
+@using ScottPlotVersion9.Client.Components.Pages 
 @inject NavigationManager Navigator
 @inject IJSRuntime JSRuntime
 
@@ -17,6 +17,21 @@ Web Assembly component from Razor Class Library project in InteractiveAuto Page
 
 <UserControl.IISGraphic @rendermode="InteractiveWebAssembly"></UserControl.IISGraphic>
 
+<h3>Dynamic Graphic Loader UserControl IISGraphic</h3>
+
+@if (fragment is not null)
+{
+    @fragment
+}
+
+<h3>Dynamic Graphic Loader Counter Component</h3>
+
+@if (fragment1 is not null)
+{
+    @fragment1
+}
+
+
 @code {
     [Parameter]
     public string ProjectName { get; set; }
@@ -24,8 +39,28 @@ Web Assembly component from Razor Class Library project in InteractiveAuto Page
     [Parameter]
     public String Content { get; set; }
 
+    private RenderFragment? fragment;
+
+    private RenderFragment? fragment1;
+
     protected override async Task OnInitializedAsync()
     {
+        // Create a dynamic render fragment that hosts the IISGraphic component
+        fragment = builder =>
+        {
+            builder.OpenComponent<DynamicComponent>(0);
+            builder.AddAttribute(1, "Type", typeof(UserControl));
+            builder.CloseComponent();
+        };
+
+        // Create a dynamic render fragment that hosts the IISGraphic component
+        fragment1 = builder =>
+        {
+            builder.OpenComponent<DynamicComponent>(0);
+            builder.AddAttribute(1, "Type", typeof(Counter));
+            builder.CloseComponent();
+        };
+
         ProjectName = "Original";
         Content = "Fans";
     }
